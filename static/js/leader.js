@@ -67,7 +67,12 @@ const Actions = {
             data: post_data,
             complete: function(jqXHR) {
                 if (200 === jqXHR.status) {
-                    window.location.href = './index.html';
+                    const data = JSON.parse(jqXHR.responseText);
+                    console.log(data.type.toString())
+                    if ('user' === data.type.toString())
+                        window.location.href = './index.html';
+                    else if ('admin' === data.type.toString())
+                        window.location.href = './admin.html';
                 }
                 else if (400 === jqXHR.status)
                     alert('请求错误！');

@@ -1,6 +1,6 @@
 from .. import app, db, login_manager
 from flask import request, current_app, jsonify, make_response
-from ..models import Account, AnonymousUser
+from ..models import Account, AnonymousUser, Student, Admin
 from flask_login import login_user, logout_user, current_user, login_required
 from . import main
 import json
@@ -29,10 +29,20 @@ def login():
     user = Account.query.filter_by(account=account).first()
     if user is not None:
         if user.password == password:
-            login_user(user, remember=remember_me)
-            print("user:"+user.name+"登录成功")
-            print("current_user"+current_user.name)
-            return jsonify({'message': 'success'})
+            if user.type == 'user':
+                s = Student.query.filter_by(id=account).first()
+                login_user(s, remember=remember_me)
+                print("Hello " + current_user.id)
+                return jsonify({'type': 'user'})
+            if user.type == 'admin':
+                a = Admin.query.filter_by(id=account).first()
+                login_user(a, remember=remember_me)
+                print("user.type is" + user.type)
+                return jsonify({'type': 'admin'})
+            if account in app.config['FLASKY_ADMIN']:
+                login_user(user, remember=remember_me)
+                return jsonify({'type': 'root'})
+            return jsonify({'message': 'type error'}), 400
         return jsonify({'message': 'password error'}), 403
     return jsonify({'message': 'no account'}), 404
 
@@ -41,15 +51,17 @@ def login():
 def register():
     data = request.form
     account = data.get('account')
-    password = data.get('password')
     name = data.get('name')
+    password = data.get('password')
     user = Account.query.filter_by(account=account).first()
     if user is None:
-        user = Account(account=account, password=password, name=name)
+        user = Account(account=account, password=password, type='user')
+        u = Student(id=account, name=name)
         db.session.add(user)
+        db.session.add(u)
         db.session.commit()
         print("用户"+account+"注册成功！")
-        return jsonify({'message': 'success'})
+        return jsonify({'type': 'student'})
     else:
         return jsonify({'message': 'account exists'}), 400
 
@@ -57,8 +69,8 @@ def register():
 @main.route('/who_am_i', methods=['GET'])
 @login_required
 def who_am_i():
-    print("current_user is:"+current_user.name)
-    return jsonify({"name": current_user.name})
+    return jsonify({"type": Account.query.filter_by(account=current_user.id).first().type,
+                    "name": current_user.name})
 
 
 @main.route('/logout', methods=['GET'])
