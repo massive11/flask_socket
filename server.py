@@ -2,8 +2,8 @@ from socket import *
 import json
 import os
 
-# host = '192.168.123.98'
-host = '172.16.155.150'
+host = '192.168.123.98'
+# host = '172.16.155.150'
 port = 1234
 ADDR = (host, port)
 BUFSIZ = 1024

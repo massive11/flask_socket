@@ -32,12 +32,10 @@ def login():
             if user.type == 'user':
                 s = Student.query.filter_by(id=account).first()
                 login_user(s, remember=remember_me)
-                print("Hello " + current_user.id)
                 return jsonify({'type': 'user'})
             if user.type == 'admin':
                 a = Admin.query.filter_by(id=account).first()
                 login_user(a, remember=remember_me)
-                print("user.type is" + user.type)
                 return jsonify({'type': 'admin'})
             if account in app.config['FLASKY_ADMIN']:
                 login_user(user, remember=remember_me)

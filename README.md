@@ -10,6 +10,8 @@
 
 2.提供人脸识别系统的实时监控功能（页面上显示接收到的实时数据）
 
+3.提供管理员登录、修改密码、管理用户的功能
+
 
 ## 项目运行
 修改config.py中的数据库配置
@@ -40,4 +42,4 @@ python app.py db upgrade
 python app.py runserver
 ```
 
-(运行server.py)
+(运行server.py，修改IP、Port)
